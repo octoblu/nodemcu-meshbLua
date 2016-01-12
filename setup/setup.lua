@@ -1,0 +1,5 @@
+require("credentials")
+file.remove("setup.lua")
+-- saveCredentials("wifi","network","password")
+-- saveCredentials("meshblu","uuid","token")
+node.restart()
