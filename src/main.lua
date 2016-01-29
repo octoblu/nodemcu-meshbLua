@@ -1,34 +1,37 @@
-require("connectWifi")
-require("credentials")
-require("register")
-require("connectMqtt")
 
-local function connect( network, password )
-  setupWifi( network, password, function(err, ip)
+print('setting up a main timer!')
+require('timer-auto'):new({callback=function()
+
+  print('inside main timer!')
+
+  local WifiSetup = require('wifi-setup')
+  local meshbluMqtt = require('meshblu-mqtt'):new()
+  local meshbluRegister = require('meshblu-register'):new()
+
+  local wifi = wifi
+  local print = print
+
+  setfenv(1,{})
+
+  print('connecting to wifi')
+
+  WifiSetup.connect( function(err, ip)
     if (err ~= nil) then
       print("! ERROR: " .. err)
       return
     end
     if (ip ~= nil) then
       print("ip: " .. ip)
-      registerWithMeshblu( function( err, uuid, token )
-        print('uuid: ' .. uuid)
-        print('token: ' .. token)
-        init_mqtt( uuid, token )
+      meshbluRegister:getCredentials( function( uuid, token )
+        if uuid and token then
+          print('uuid: ' .. uuid)
+          print('token: ' .. token)
+          meshbluMqtt:init( uuid, token )
+        else
+          print('error registering uuid and token')
+        end
       end )
     end
   end )
-end
 
-local network, password = loadCredentials("wifi")
-if (network == nil) then
-  print("WIFI DATA DOES NOT EXIST!")
-  wifi.setmode(wifi.STATION)
-  print("ENTERING SMART CONFIG MODE")
-  wifi.startsmart(0, function(network, password)
-    saveCredentials("wifi",network,password)
-    connect(network,password)
-  end )
-else
-  connect(network,password)
-end
+end}):alarm(5000)
