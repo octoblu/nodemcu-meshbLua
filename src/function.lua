@@ -1,11 +1,10 @@
-local pcall = pcall
-local assert = assert
-local setfenv = setfenv
 local loadstring = loadstring
+local setfenv = setfenv
+local assert = assert
+local pcall = pcall
 
 local Package = {}
-
-setfenv(1,{})
+setfenv(1,Package)
 
 local function doScript(context,script)
   local condition = loadstring(script)

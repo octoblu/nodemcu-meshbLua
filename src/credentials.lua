@@ -1,9 +1,12 @@
-local file = file
-local string = string
-local assert = assert
+local xor = require('xor')
 local setmetatable = setmetatable
+local require = require
+local assert = assert
+local string = string
+local table = table
+local file = file
 
-local Package = {prefix='.', suffix='.data'}
+local Package = {prefix='.', suffix='.data', key=nil}
 setfenv(1,Package)
 
 function Package:new(o)
@@ -21,18 +24,23 @@ function Package:load()
   if (file.open(self.filename,"r")) then
     local data = file.read()
     file.close()
-    local name, value = string.match(data, "([^\n]*)\n([^\n]*)")
-    return name, value
+    data = xor(data, self.key)
+    return data:match((data:gsub("[^\n]*\n?", "([^\n]*)\n?")))
   end
 end
 
-function Package:save(name, value)
-  local data = (name or "") .. "\n" .. (value or "")
-  file.remove(self.filename)
+function Package:save(...)
+  local data = table.concat(arg,'\n')
+  data = xor(data, self.key)
+  -- file.remove(self.filename)
   file.open(self.filename,"w+")
   file.write(data)
   file.flush()
   file.close()
+end
+
+function Package:exists()
+  return file.exists(self.filename)
 end
 
 return Package

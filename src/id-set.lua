@@ -1,7 +1,6 @@
-local print = print
-local table = table
-local assert = assert
 local setmetatable = setmetatable
+local assert = assert
+local table = table
 
 local Package = {min=0, max=-1}
 setfenv(1,Package)

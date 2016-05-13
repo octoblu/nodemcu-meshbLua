@@ -1,37 +1,27 @@
+_G.log = require('log')
+_G.Timer = require('timer-auto')
 
-print('setting up a main timer!')
-require('timer-auto'):new({callback=function()
+_G.mqttClient = require('mqtt-client'):new({
+  host="192.168.1.87",
+  port=8883,
+  secure=1,
+})
 
-  print('inside main timer!')
+-- _G.file = require('file-safe')
+-- _G.print = function()end
 
-  local WifiSetup = require('wifi-setup')
-  local meshbluMqtt = require('meshblu-mqtt'):new()
-  local meshbluRegister = require('meshblu-register'):new()
+node.setcpufreq(node.CPU160MHZ)
 
-  local wifi = wifi
-  local print = print
+Timer.softwd(60)
+log.error('main...')
+local finished = function(error)
+  assert(not error)
+  log.error('...fin')
+  -- Timer.softwd(5*60)
+  Timer.softwd(0)
+end
 
-  setfenv(1,{})
-
-  print('connecting to wifi')
-
-  WifiSetup.connect( function(err, ip)
-    if (err ~= nil) then
-      print("! ERROR: " .. err)
-      return
-    end
-    if (ip ~= nil) then
-      print("ip: " .. ip)
-      meshbluRegister:getCredentials( function( uuid, token )
-        if uuid and token then
-          print('uuid: ' .. uuid)
-          print('token: ' .. token)
-          meshbluMqtt:init( uuid, token )
-        else
-          print('error registering uuid and token')
-        end
-      end )
-    end
-  end )
-
-end}):alarm(5000)
+require('async-waterfall')(finished, {
+  require('mqtt-load-auth'),
+  'wifi-connect'
+})

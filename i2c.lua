@@ -1,7 +1,0 @@
-(function ()
-  i2c.setup(0,3,4,i2c.SLOW)
-  i2c.start(0)
-  i2c.address(0,0x3C,i2c.TRANSMITTER)
-  i2c.write(0,"hello","world")
-  i2c.stop(0)
-)()

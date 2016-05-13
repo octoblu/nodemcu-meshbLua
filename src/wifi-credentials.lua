@@ -1,1 +1,1 @@
-return require('credentials'):new({name='wifi'})
+return require('credentials'):new({name='wifi', key='ningi'})

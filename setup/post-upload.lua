@@ -1,0 +1,6 @@
+file.remove("post-upload.lua")
+-- require("wifi-credentials"):save("Gangplank","walktheplank")
+-- require("mqtt-credentials"):save("uuid","token")
+file.open(".halt","w")
+file.open(".logLevel","w")
+node.restart()
